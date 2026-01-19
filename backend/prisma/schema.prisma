@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model DAO {
+  id             String        @id
+  name           String
+  contractId     String        @unique
+  memberCount    Int           @default(0)
+  proposals      Proposal[]
+  griSnapshots   GRISnapshot[]
+  lastIndexedAt  DateTime      @default(now())
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model Proposal {
+  id             Int
+  daoId          String
+  dao            DAO       @relation(fields: [daoId], references: [id])
+  proposer       String
+  description    String
+  status         String
+  kind           Json
+  voteCounts     Json
+  submissionTime BigInt
+  votes          Vote[]
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@id([daoId, id]) // Composite ID (Proposal ID is distinct per DAO)
+}
+
+model Vote {
+  id         String   @id @default(uuid())
+  proposalId Int
+  daoId      String
+  proposal   Proposal @relation(fields: [daoId, proposalId], references: [daoId, id])
+  voter      String
+  vote       String   // 'Approve' | 'Reject' | 'Remove'
+  createdAt  DateTime @default(now())
+
+  @@unique([daoId, proposalId, voter])
+}
+
+model GRISnapshot {
+  id        String   @id @default(uuid())
+  daoId     String
+  dao       DAO      @relation(fields: [daoId], references: [id])
+  score     Float
+  breakdown Json
+  createdAt DateTime @default(now())
+}

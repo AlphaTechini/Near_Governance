@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-dark-bg;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-dark-border rounded hover:bg-zinc-600 transition-colors;
+}
+
+/* Chart.js tooltip customization */
+#chartjs-tooltip {
+  @apply bg-dark-card border border-dark-border rounded shadow-xl p-2 text-sm z-50;
+}
