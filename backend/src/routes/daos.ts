@@ -10,7 +10,7 @@ import {
 } from '../services/daoIndexer.js';
 import { getPolicy } from '../services/nearClient.js'; // Fetch policy live or cache in DB later
 import { calculateGRI, getGRIGrade } from '../services/griEngine.js';
-import type { DAOListResponse, DAOOverviewResponse } from '../types/index.js';
+import type { DAOListResponse, DAOOverviewResponse, Proposal } from '../types/index.js';
 
 export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
     /**
@@ -23,7 +23,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
         const daosWithGRI = await Promise.all(daos.map(async (dao) => {
             const proposals = await getDAOProposals(dao.id);
             const policy = await getPolicy(dao.id);
-            const gri = calculateGRI(proposals, policy, dao.memberCount);
+            const gri = calculateGRI(proposals, policy ?? undefined, dao.memberCount);
             return {
                 ...dao,
                 griScore: gri.overall,
@@ -33,7 +33,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
         // Calculate network median GRI
         const griScores = daosWithGRI.map((d) => d.griScore ?? 0);
         const networkGRI = griScores.length > 0
-            ? griScores.reduce((a, b) => a + b, 0) / griScores.length
+            ? griScores.reduce((a: number, b: number) => a + b, 0) / griScores.length
             : 0;
 
         const response: DAOListResponse = {
@@ -63,11 +63,11 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
 
             const proposals = await getDAOProposals(id);
             const policy = await getPolicy(id);
-            const gri = calculateGRI(proposals, policy, dao.memberCount);
+            const gri = calculateGRI(proposals, policy ?? undefined, dao.memberCount);
 
             // Get recent proposals (last 10)
             const recentProposals = [...proposals]
-                .sort((a, b) => Number(b.submissionTime) - Number(a.submissionTime))
+                .sort((a: Proposal, b: Proposal) => Number(b.submissionTime) - Number(a.submissionTime))
                 .slice(0, 10);
 
             // Calculate active members (those who voted in last 30 days)
@@ -120,7 +120,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
 
             // Sort by submission time, newest first
             proposals = [...proposals].sort(
-                (a, b) => Number(b.submissionTime) - Number(a.submissionTime)
+                (a: Proposal, b: Proposal) => Number(b.submissionTime) - Number(a.submissionTime)
             );
 
             return {
@@ -149,7 +149,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
 
             const proposals = await getDAOProposals(id);
             const policy = await getPolicy(id);
-            const gri = calculateGRI(proposals, policy, dao.memberCount);
+            const gri = calculateGRI(proposals, policy ?? undefined, dao.memberCount);
 
             return {
                 daoId: id,

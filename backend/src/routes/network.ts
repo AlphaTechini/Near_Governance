@@ -31,7 +31,7 @@ export async function networkRoutes(fastify: FastifyInstance): Promise<void> {
         for (const dao of daos) {
             const proposals = await getDAOProposals(dao.id);
             const policy = await getPolicy(dao.id);
-            const gri = calculateGRI(proposals, policy, dao.memberCount);
+            const gri = calculateGRI(proposals, policy ?? undefined, dao.memberCount);
             griScores.push(gri.overall);
 
             totalProposals += proposals.length;

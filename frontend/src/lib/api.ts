@@ -29,7 +29,7 @@ export async function fetchDAOOverview(id: string): Promise<DAOOverviewResponse>
     return res.json();
 }
 
-export async function fetchProposal(daoId: string, proposalId: string): Promise<{ proposal: Proposal; participationRate: number }> {
+export async function fetchProposal(daoId: string, proposalId: string): Promise<{ proposal: Proposal; participationRate: number; memberCount?: number }> {
     const res = await fetch(`${API_BASE}/dao/${daoId}/proposal/${proposalId}`);
     if (!res.ok) throw new Error(`Failed to fetch proposal ${proposalId}`);
     return res.json();

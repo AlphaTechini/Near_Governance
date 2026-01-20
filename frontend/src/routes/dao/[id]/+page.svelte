@@ -8,7 +8,7 @@
 
     let daoId = "";
     // Update daoId when page params change
-    $: daoId = $page.params.id;
+    $: daoId = $page.params.id ?? "";
 
     let data: DAOOverviewResponse | null = null;
     let loading = true;

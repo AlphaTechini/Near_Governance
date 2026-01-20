@@ -4,8 +4,8 @@
     import { fetchProposal } from "$lib/api";
     import type { Proposal } from "$lib/types";
 
-    let daoId = $page.params.id;
-    let proposalId = $page.params.proposalId;
+    let daoId = $page.params.id ?? "";
+    let proposalId = $page.params.proposalId ?? "";
 
     let proposal: Proposal | null = null;
     let participationRate = 0;
@@ -14,11 +14,20 @@
     let memberCount = 0;
 
     onMount(async () => {
+        if (!daoId || !proposalId) {
+            error = "Invalid DAO or Proposal ID";
+            loading = false;
+            return;
+        }
         try {
-            const res = await fetchProposal(daoId, proposalId);
+            const res = (await fetchProposal(daoId, proposalId)) as {
+                proposal: Proposal;
+                participationRate: number;
+                memberCount?: number;
+            };
             proposal = res.proposal;
             participationRate = res.participationRate;
-            memberCount = res.memberCount;
+            memberCount = res.memberCount ?? 0;
         } catch (e) {
             error = (e as Error).message;
         } finally {

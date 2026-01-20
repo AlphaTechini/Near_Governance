@@ -9,7 +9,7 @@ import {
     normalizeProposal,
 } from './nearClient.js';
 import { prisma } from './db.js';
-import type { DAOPolicy, Actor } from '../types/index.js';
+import type { DAOPolicy, Actor, Proposal, VoteAction, ProposalKind, ProposalStatus, VoteCounts } from '../types/index.js';
 import { TRACKED_DAOS } from '../types/index.js';
 import { POLLING_CONFIG } from '../config/near.js';
 
@@ -161,7 +161,7 @@ export async function getDAO(id: string) {
     return prisma.dAO.findUnique({ where: { id } });
 }
 
-export async function getDAOProposals(daoId: string) {
+export async function getDAOProposals(daoId: string): Promise<Proposal[]> {
     const proposals = await prisma.proposal.findMany({
         where: { daoId },
         include: { votes: true },
@@ -178,11 +178,11 @@ export async function needsRefresh(): Promise<boolean> {
 }
 
 // Helper: Map Prisma Proposal -> App Type
-function mapDBProposalToType(p: any): any {
-    const votes: Record<string, string> = {};
+function mapDBProposalToType(p: any): Proposal {
+    const votes: Record<string, VoteAction> = {};
     if (p.votes) {
         for (const v of p.votes) {
-            votes[v.voter] = v.vote;
+            votes[v.voter] = v.vote as VoteAction;
         }
     }
 
@@ -191,9 +191,9 @@ function mapDBProposalToType(p: any): any {
         daoId: p.daoId,
         proposer: p.proposer,
         description: p.description,
-        kind: p.kind,
-        status: p.status,
-        voteCount: p.voteCounts,
+        kind: p.kind as ProposalKind,
+        status: p.status as ProposalStatus,
+        voteCount: p.voteCounts as VoteCounts,
         submissionTime: p.submissionTime.toString(),
         votes,
     };

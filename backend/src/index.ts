@@ -50,7 +50,7 @@ async function start() {
 
         // Start periodic refresh
         setInterval(async () => {
-            if (needsRefresh()) {
+            if (await needsRefresh()) {
                 await refreshDAOData();
             }
         }, 60 * 1000); // Check every minute
