@@ -1,3 +1,20 @@
 node_modules
 .env
+.env.*
+!.env.example
 Overview.md
+
+# Build
+.svelte-kit
+.vercel
+build/
+dist/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db

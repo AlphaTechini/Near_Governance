@@ -13,11 +13,11 @@
     },
     "dependencies": {
         "@fastify/cors": "^9.0.1",
+        "@prisma/client": "^7.2.0",
         "fastify": "^4.26.2",
         "near-api-js": "^4.0.3"
     },
     "devDependencies": {
-        "@prisma/client": "^7.2.0",
         "@prisma/config": "^7.2.0",
         "@types/node": "^20.11.19",
         "dotenv": "^17.2.3",

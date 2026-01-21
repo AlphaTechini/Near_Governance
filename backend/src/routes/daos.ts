@@ -20,7 +20,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
         const daos = await getAllDAOs();
 
         // Calculate GRI for each DAO
-        const daosWithGRI = await Promise.all(daos.map(async (dao) => {
+        const daosWithGRI = await Promise.all(daos.map(async (dao: any) => {
             const proposals = await getDAOProposals(dao.id);
             const policy = await getPolicy(dao.id);
             const gri = calculateGRI(proposals, policy ?? undefined, dao.memberCount);
@@ -31,7 +31,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
         }));
 
         // Calculate network median GRI
-        const griScores = daosWithGRI.map((d) => d.griScore ?? 0);
+        const griScores = daosWithGRI.map((d: any) => d.griScore ?? 0);
         const networkGRI = griScores.length > 0
             ? griScores.reduce((a: number, b: number) => a + b, 0) / griScores.length
             : 0;
