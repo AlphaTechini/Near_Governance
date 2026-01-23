@@ -12,7 +12,7 @@ export const NEAR_CONFIG = {
 export const SERVER_CONFIG = {
     port: Number(process.env.PORT) || 3001,
     host: process.env.HOST || '0.0.0.0',
-    corsOrigins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173'],
+    corsOrigins: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:5173', 'https://near-governance.vercel.app', 'https://neardao.cyberpunkinc.xyz'],
 } as const;
 
 // Polling configuration for MVP
