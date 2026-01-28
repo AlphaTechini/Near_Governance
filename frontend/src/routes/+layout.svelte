@@ -3,15 +3,30 @@
   import { onMount } from "svelte";
   import "../app.css";
   import { page } from "$app/stores";
+  import { fetchDAOs } from "$lib/api";
+  import type { DAO } from "$lib/types";
 
   let { children } = $props();
 
-  onMount(() => {
+  let activeDAOs: DAO[] = [];
+  let loadingDAOs = true;
+
+  onMount(async () => {
     injectAnalytics();
     // Ping backend to prevent cold start
     fetch("https://near-governance.onrender.com").catch((e) => {
       console.debug("Backend ping failed", e);
     });
+
+    // Fetch DAOs and filter to active ones (with proposals)
+    try {
+      const res = await fetchDAOs();
+      activeDAOs = res.daos.filter((dao) => dao.proposalCount > 0);
+    } catch (e) {
+      console.error("Failed to fetch DAOs for sidebar", e);
+    } finally {
+      loadingDAOs = false;
+    }
   });
 </script>
 
@@ -48,37 +63,26 @@
         Active DAOs
       </div>
 
-      <!-- Hardcoded for MVP, would be dynamic list in real app -->
-      <a
-        href="/dao/sputnik-dao.near"
-        class="block px-4 py-2 rounded-lg text-sm font-medium transition-colors {$page.url.pathname.includes(
-          'sputnik-dao.near',
-        )
-          ? 'bg-zinc-800 text-white'
-          : 'text-zinc-500 hover:text-zinc-300'}"
-      >
-        Sputnik DAO
-      </a>
-      <a
-        href="/dao/marketing.sputnik-dao.near"
-        class="block px-4 py-2 rounded-lg text-sm font-medium transition-colors {$page.url.pathname.includes(
-          'marketing',
-        )
-          ? 'bg-zinc-800 text-white'
-          : 'text-zinc-500 hover:text-zinc-300'}"
-      >
-        Marketing DAO
-      </a>
-      <a
-        href="/dao/devhub.sputnik-dao.near"
-        class="block px-4 py-2 rounded-lg text-sm font-medium transition-colors {$page.url.pathname.includes(
-          'devhub',
-        )
-          ? 'bg-zinc-800 text-white'
-          : 'text-zinc-500 hover:text-zinc-300'}"
-      >
-        DevHub
-      </a>
+      {#if loadingDAOs}
+        <div class="px-4 py-2 text-sm text-zinc-600 animate-pulse">
+          Loading...
+        </div>
+      {:else if activeDAOs.length === 0}
+        <div class="px-4 py-2 text-sm text-zinc-600">No active DAOs found</div>
+      {:else}
+        {#each activeDAOs as dao (dao.id)}
+          <a
+            href="/dao/{dao.id}"
+            class="block px-4 py-2 rounded-lg text-sm font-medium transition-colors {$page.url.pathname.includes(
+              dao.id,
+            )
+              ? 'bg-zinc-800 text-white'
+              : 'text-zinc-500 hover:text-zinc-300'}"
+          >
+            {dao.name}
+          </a>
+        {/each}
+      {/if}
     </nav>
 
     <div class="absolute bottom-6 left-6 right-6">
