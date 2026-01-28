@@ -156,9 +156,24 @@ export interface TrendPoint {
   value: number;
 }
 
-// Known DAOs to track (MVP - hardcoded list)
+// Top DAOs by proposal count (curated from factory data)
+// These are the most active DAOs on NEAR, selected to avoid polling 300K+ DAOs
 export const TRACKED_DAOS = [
-  'near.sputnik-dao.near',
-  'marketing.sputnik-dao.near',
-  'devhub.sputnik-dao.near',
+  // Tier 1: Major DAOs with 1000+ proposals
+  'marketing.sputnik-dao.near',    // ~1059 proposals
+  'news.sputnik-dao.near',          // ~5421 proposals (most active!)
+  'marmaj.sputnik-dao.near',        // ~1649 proposals
+
+  // Tier 2: Active DAOs with 500+ proposals
+  'nxm.sputnik-dao.near',           // ~777 proposals
+  'ref-finance.sputnik-dao.near',   // ~777 proposals
+  'creatives.sputnik-dao.near',     // ~764 proposals
+  'hak.sputnik-dao.near',           // ~956 proposals
+  'community.sputnik-dao.near',     // ~573 proposals
+
+  // Tier 3: Notable DAOs with 100+ proposals
+  'openshards.sputnik-dao.near',    // ~386 proposals
+  'thekindao.sputnik-dao.near',     // ~364 proposals
+  'croncat.sputnik-dao.near',       // ~351 proposals
+  'onboarding-dao.sputnik-dao.near', // ~244 proposals
 ];

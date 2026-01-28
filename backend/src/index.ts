@@ -44,18 +44,7 @@ fastify.get('/', async (request, reply) => {
 // Start server
 async function start() {
     try {
-        // Initial data load
-        console.log('Loading initial DAO data...');
-        await refreshDAOData();
-
-        // Start periodic refresh
-        setInterval(async () => {
-            if (await needsRefresh()) {
-                await refreshDAOData();
-            }
-        }, 60 * 1000); // Check every minute
-
-        // Start listening
+        // START SERVER FIRST - Bind to port immediately for Render health checks
         await fastify.listen({
             port: SERVER_CONFIG.port,
             host: SERVER_CONFIG.host,
@@ -66,7 +55,23 @@ async function start() {
 ║  Governance Reality Index (GRI) API Server    ║
 ║  Running on http://localhost:${SERVER_CONFIG.port}            ║
 ╚═══════════════════════════════════════════════╝
-    `);
+        `);
+
+        // THEN start data refresh in background (non-blocking)
+        console.log('Starting initial DAO data refresh in background...');
+        refreshDAOData()
+            .then(() => console.log('Initial DAO data refresh complete.'))
+            .catch(err => console.error('Background refresh failed:', err));
+
+        // Periodic refresh (every 5 minutes)
+        setInterval(async () => {
+            if (await needsRefresh()) {
+                console.log('Starting periodic DAO data refresh...');
+                refreshDAOData()
+                    .then(() => console.log('Periodic DAO data refresh complete.'))
+                    .catch(err => console.error('Periodic refresh failed:', err));
+            }
+        }, 5 * 60 * 1000); // Check every 5 minutes
     } catch (err) {
         fastify.log.error(err);
         process.exit(1);

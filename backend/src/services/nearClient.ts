@@ -29,7 +29,7 @@ export async function initNearConnection(): Promise<Near> {
 export async function getProposals(
     daoId: string,
     fromIndex = 0,
-    limit = POLLING_CONFIG.maxProposalsPerDAO
+    limit: number = POLLING_CONFIG.maxProposalsPerDAO
 ): Promise<RawProposal[]> {
     try {
         const near = await initNearConnection();

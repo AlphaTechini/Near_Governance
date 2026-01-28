@@ -14,23 +14,23 @@ import type { DAOPolicy, Actor, Proposal, VoteAction, ProposalKind, ProposalStat
 import { TRACKED_DAOS } from '../types/index.js';
 import { POLLING_CONFIG } from '../config/near.js';
 
+// Helper for delays between RPC calls
+function delay(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Initialize and refresh DAO data from chain
+ * Only indexes TRACKED_DAOS (curated list of top DAOs)
  */
 export async function refreshDAOData(): Promise<void> {
-    console.log('Refreshing DAO data from chain...');
+    console.log(`Refreshing DAO data for ${TRACKED_DAOS.length} tracked DAOs...`);
 
-    // 1. Get list of DAOs from Factory
-    // TODO: Pagination for full list (currently getting top 50 for MVP speed)
-    const factoryDaos = await getDAOListFromFactory('sputnik-dao.near', 0, 50);
-    console.log(`Found ${factoryDaos.length} DAOs from factory.`);
-
-    // 2. Merge with tracked list (priority to tracked if not in factory)
-    const allDaos = Array.from(new Set([...TRACKED_DAOS, ...factoryDaos]));
-
-    for (const daoId of allDaos) {
+    for (const daoId of TRACKED_DAOS) {
         try {
             await indexDAO(daoId);
+            // Small delay between DAOs to reduce RPC pressure
+            await delay(200);
         } catch (error) {
             console.error(`Failed to index DAO ${daoId}:`, error);
         }
@@ -73,18 +73,25 @@ async function indexDAO(daoId: string): Promise<void> {
     const lastIndexedId = lastLocal?.id ?? -1;
     const startId = lastIndexedId + 1;
 
-    if (startId >= totalOnChain) {
+    // Only fetch the most recent N proposals (defined in config)
+    const MAX_PROPOSALS = POLLING_CONFIG.maxProposalsPerDAO; // 100
+    const effectiveStartId = Math.max(startId, totalOnChain - MAX_PROPOSALS);
+
+    if (effectiveStartId >= totalOnChain) {
         console.log(`${daoId}: Up to date (Local: ${lastIndexedId}, Chain: ${totalOnChain})`);
         return;
     }
 
-    console.log(`${daoId}: Backfilling from ID ${startId} to ${totalOnChain}...`);
+    const proposalsToFetch = totalOnChain - effectiveStartId;
+    console.log(`${daoId}: Fetching ${proposalsToFetch} proposals (ID ${effectiveStartId} to ${totalOnChain})...`);
 
     // 3. Fetch in batches
-    const BATCH_SIZE = 100;
-    for (let i = startId; i < totalOnChain; i += BATCH_SIZE) {
-        // Explicitly pass batch size, limited by config max or batch size
-        const rawProposals = await getProposals(daoId, i, BATCH_SIZE);
+    const BATCH_SIZE = 50; // Smaller batches for more reliable fetching
+    for (let i = effectiveStartId; i < totalOnChain; i += BATCH_SIZE) {
+        const rawProposals = await getProposals(daoId, i, Math.min(BATCH_SIZE, totalOnChain - i));
+
+        // Small delay between batches to avoid rate limits
+        await delay(100);
 
         for (const raw of rawProposals) {
             const p = normalizeProposal(raw, daoId);
