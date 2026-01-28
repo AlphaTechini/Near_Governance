@@ -126,6 +126,32 @@ export async function isValidDAO(contractId: string): Promise<boolean> {
     }
 }
 
+/**
+ * Get list of DAOs from factory contract
+ */
+export async function getDAOListFromFactory(
+    factoryId: string = 'sputnik-dao.near',
+    fromIndex = 0,
+    limit = 100
+): Promise<string[]> {
+    try {
+        const near = await initNearConnection();
+        const account = await near.account('dontcare');
+
+        const result = await account.viewFunction({
+            contractId: factoryId,
+            methodName: 'get_dao_list',
+            args: { from_index: fromIndex, limit },
+        });
+
+        return result as string[];
+    } catch (error) {
+        console.error(`Error fetching DAO list from ${factoryId}:`, error);
+        return [];
+    }
+}
+
+
 // Raw proposal type from Sputnik DAO contract
 export interface RawProposal {
     id: number;

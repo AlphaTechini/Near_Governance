@@ -158,9 +158,7 @@ export interface TrendPoint {
 
 // Known DAOs to track (MVP - hardcoded list)
 export const TRACKED_DAOS = [
-  'sputnik-dao.near',
   'near.sputnik-dao.near',
   'marketing.sputnik-dao.near',
-  'creative.sputnik-dao.near',
   'devhub.sputnik-dao.near',
 ];

@@ -7,6 +7,7 @@ import {
     getProposalCount,
     getPolicy,
     normalizeProposal,
+    getDAOListFromFactory,
 } from './nearClient.js';
 import { prisma } from './db.js';
 import type { DAOPolicy, Actor, Proposal, VoteAction, ProposalKind, ProposalStatus, VoteCounts } from '../types/index.js';
@@ -19,7 +20,15 @@ import { POLLING_CONFIG } from '../config/near.js';
 export async function refreshDAOData(): Promise<void> {
     console.log('Refreshing DAO data from chain...');
 
-    for (const daoId of TRACKED_DAOS) {
+    // 1. Get list of DAOs from Factory
+    // TODO: Pagination for full list (currently getting top 50 for MVP speed)
+    const factoryDaos = await getDAOListFromFactory('sputnik-dao.near', 0, 50);
+    console.log(`Found ${factoryDaos.length} DAOs from factory.`);
+
+    // 2. Merge with tracked list (priority to tracked if not in factory)
+    const allDaos = Array.from(new Set([...TRACKED_DAOS, ...factoryDaos]));
+
+    for (const daoId of allDaos) {
         try {
             await indexDAO(daoId);
         } catch (error) {

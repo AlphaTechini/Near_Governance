@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { injectAnalytics } from "@vercel/analytics/sveltekit";
   import { onMount } from "svelte";
   import "../app.css";
   import { page } from "$app/stores";
@@ -6,6 +7,7 @@
   let { children } = $props();
 
   onMount(() => {
+    injectAnalytics();
     // Ping backend to prevent cold start
     fetch("https://near-governance.onrender.com").catch((e) => {
       console.debug("Backend ping failed", e);

@@ -4,7 +4,7 @@
 
 export const NEAR_CONFIG = {
     networkId: 'mainnet',
-    nodeUrl: 'https://rpc.mainnet.near.org',
+    nodeUrl: 'https://free.rpc.fastnear.com',
     archivalNodeUrl: 'https://archival-rpc.mainnet.near.org',
     explorerUrl: 'https://nearblocks.io',
 } as const;

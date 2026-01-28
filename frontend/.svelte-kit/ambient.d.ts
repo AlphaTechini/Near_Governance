@@ -26,8 +26,8 @@
  * ```
  */
 declare module '$env/static/private' {
+	export const VITE_BACKEND_URL: string;
 	export const ALLUSERSPROFILE: string;
-	export const ANTIGRAVITY_AGENT: string;
 	export const ANTIGRAVITY_CLI_ALIAS: string;
 	export const APPDATA: string;
 	export const ChocolateyInstall: string;
@@ -72,7 +72,6 @@ declare module '$env/static/private' {
 	export const OneDrive: string;
 	export const ORIGINAL_XDG_CURRENT_DESKTOP: string;
 	export const OS: string;
-	export const PAGER: string;
 	export const Path: string;
 	export const PATHEXT: string;
 	export const pnpm_config_verify_deps_before_run: string;
@@ -137,8 +136,8 @@ declare module '$env/static/public' {
  */
 declare module '$env/dynamic/private' {
 	export const env: {
+		VITE_BACKEND_URL: string;
 		ALLUSERSPROFILE: string;
-		ANTIGRAVITY_AGENT: string;
 		ANTIGRAVITY_CLI_ALIAS: string;
 		APPDATA: string;
 		ChocolateyInstall: string;
@@ -183,7 +182,6 @@ declare module '$env/dynamic/private' {
 		OneDrive: string;
 		ORIGINAL_XDG_CURRENT_DESKTOP: string;
 		OS: string;
-		PAGER: string;
 		Path: string;
 		PATHEXT: string;
 		pnpm_config_verify_deps_before_run: string;

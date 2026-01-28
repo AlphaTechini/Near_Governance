@@ -1,5 +1,6 @@
 {
 	"/": [],
 	"/dao/[id]": [],
+	"/dao/[id]/proposals": [],
 	"/dao/[id]/proposal/[proposalId]": []
 }
