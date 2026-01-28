@@ -11,8 +11,8 @@ import type {
 
 const API_BASE = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
 
-export async function fetchNetworkHealth(): Promise<NetworkHealthResponse> {
-    const res = await fetch(`${API_BASE}/network/health`);
+export async function fetchNetworkHealth(days = 30): Promise<NetworkHealthResponse> {
+    const res = await fetch(`${API_BASE}/network/health?days=${days}`);
     if (!res.ok) throw new Error('Failed to fetch network health');
     return res.json();
 }

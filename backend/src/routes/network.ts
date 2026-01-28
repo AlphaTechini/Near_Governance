@@ -15,8 +15,11 @@ import type { NetworkHealthResponse, TrendPoint } from '../types/index.js';
 export async function networkRoutes(fastify: FastifyInstance): Promise<void> {
     /**
      * GET /network/health - Network-wide governance health
+     * Query params:
+     *   - days: number of days to consider for "active" status (default: 30)
      */
-    fastify.get('/network/health', async (request: FastifyRequest, reply: FastifyReply) => {
+    fastify.get('/network/health', async (request: FastifyRequest<{ Querystring: { days?: string } }>, reply: FastifyReply) => {
+        const days = Math.min(Math.max(Number(request.query.days) || 30, 1), 365); // Clamp between 1-365
         const daos = await getAllDAOs();
 
         // Calculate GRI for all DAOs
@@ -26,7 +29,7 @@ export async function networkRoutes(fastify: FastifyInstance): Promise<void> {
         let activeDAOs = 0;
         let inactiveDAOs = 0;
 
-        const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+        const cutoffTime = Date.now() - days * 24 * 60 * 60 * 1000;
 
         for (const dao of daos) {
             const proposals = await getDAOProposals(dao.id);
@@ -41,10 +44,10 @@ export async function networkRoutes(fastify: FastifyInstance): Promise<void> {
                 totalVotes += Object.keys(proposal.votes).length;
             }
 
-            // Check if DAO is active (has proposals in last 30 days)
+            // Check if DAO is active (has proposals in last N days)
             const hasRecentActivity = proposals.some((p) => {
                 const submissionTime = Number(p.submissionTime) / 1_000_000;
-                return submissionTime > thirtyDaysAgo;
+                return submissionTime > cutoffTime;
             });
 
             if (hasRecentActivity) {
