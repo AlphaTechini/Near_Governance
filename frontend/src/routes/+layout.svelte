@@ -8,8 +8,23 @@
 
   let { children } = $props();
 
-  let activeDAOs: DAO[] = [];
-  let loadingDAOs = true;
+  let activeDAOs = $state<DAO[]>([]);
+  let loadingDAOs = $state(true);
+
+  const CURATED_DAOS = [
+    "marketing.sputnik-dao.near",
+    "news.sputnik-dao.near",
+    "marmaj.sputnik-dao.near",
+    "nxm.sputnik-dao.near",
+    "ref-finance.sputnik-dao.near",
+    "creatives.sputnik-dao.near",
+    "hak.sputnik-dao.near",
+    "community.sputnik-dao.near",
+    "openshards.sputnik-dao.near",
+    "thekindao.sputnik-dao.near",
+    "croncat.sputnik-dao.near",
+    "onboarding-dao.sputnik-dao.near",
+  ];
 
   onMount(async () => {
     injectAnalytics();
@@ -18,10 +33,12 @@
       console.debug("Backend ping failed", e);
     });
 
-    // Fetch DAOs and filter to active ones (with proposals)
+    // Fetch DAOs and filter to curated active ones
     try {
       const res = await fetchDAOs();
-      activeDAOs = res.daos.filter((dao) => dao.proposalCount > 0);
+      activeDAOs = res.daos.filter(
+        (dao) => CURATED_DAOS.includes(dao.id) && dao.proposalCount > 0,
+      );
     } catch (e) {
       console.error("Failed to fetch DAOs for sidebar", e);
     } finally {

@@ -36,12 +36,14 @@ export async function refreshDAOData(): Promise<void> {
         }
     }
 
-    console.log('Tracked DAOs refresh complete. Starting background discovery...');
+    console.log('Tracked DAOs refresh complete.');
 
-    // Fire off background discovery (non-blocking)
-    discoverActiveDAOs().catch(err =>
-        console.error('Background DAO discovery failed:', err)
-    );
+    // Background discovery disabled - using only curated TRACKED_DAOS list
+    // The factory discovery was causing duplicate suffix issues and indexing many dead DAOs
+    // To re-enable, uncomment the following:
+    // discoverActiveDAOs().catch(err =>
+    //     console.error('Background DAO discovery failed:', err)
+    // );
 }
 
 /**
