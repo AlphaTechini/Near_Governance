@@ -13,15 +13,21 @@ const fastify = Fastify({
     logger: true,
 });
 
+console.log('[STARTUP] Fastify instance created');
+
 // Register CORS
 await fastify.register(cors, {
     origin: SERVER_CONFIG.corsOrigins,
     methods: ['GET', 'POST', 'OPTIONS'],
 });
 
+console.log('[STARTUP] CORS registered');
+
 // Register routes
 fastify.register(daoRoutes);
 fastify.register(networkRoutes);
+
+console.log('[STARTUP] Routes registered, calling start()...');
 
 // Root endpoint
 fastify.get('/', async (request, reply) => {
@@ -44,12 +50,14 @@ fastify.get('/', async (request, reply) => {
 // Start server
 async function start() {
     try {
+        console.log('[STARTUP] start() called, binding to port...');
         // START SERVER FIRST - Bind to port immediately for Render health checks
         await fastify.listen({
             port: SERVER_CONFIG.port,
             host: SERVER_CONFIG.host,
         });
 
+        console.log(`[STARTUP] Server is listening on ${SERVER_CONFIG.host}:${SERVER_CONFIG.port}`);
         console.log(`
 ╔═══════════════════════════════════════════════╗
 ║  Governance Reality Index (GRI) API Server    ║
