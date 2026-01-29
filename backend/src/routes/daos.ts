@@ -27,6 +27,7 @@ export async function daoRoutes(fastify: FastifyInstance): Promise<void> {
             return {
                 ...dao,
                 griScore: gri.overall,
+                proposalCount: proposals.length,
             };
         }));
 
